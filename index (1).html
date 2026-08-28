@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#173f31">
+<title>Wspólny Portfel</title>
+<style>
+:root{
+  --bg:#f3efe4;--paper:#fffdf8;--green:#315c48;--green2:#1f4436;
+  --gold:#d8aa43;--red:#b85f53;--blue:#416783;--line:#ded8ca;--muted:#748079;--text:#1d2a24;
+  font:15px Inter,Arial,sans-serif;color:var(--text);background:var(--bg)
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+aside{background:#fff;border-right:1px solid var(--line);padding:24px 16px;position:sticky;top:0;height:100vh}
+.logo{font-size:20px;font-weight:900;color:var(--green2);margin:4px 10px 28px}
+.logo small{display:block;font-size:10px;font-weight:700;color:var(--muted);margin-top:4px}
+nav{display:grid;gap:8px}
+nav button{border:0;background:transparent;padding:13px 14px;border-radius:12px;text-align:left;font-weight:800;color:#68736d}
+nav button.active,nav button:hover{background:#e7efe9;color:var(--green)}
+main{padding:26px 30px 100px;min-width:0}
+header{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:14px}
+h1,h2,h3{margin:0}
+h1{font-size:26px;color:var(--green2)}
+.muted,small{color:var(--muted)}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:20px}
+.month-strip{display:grid;grid-template-columns:auto auto minmax(0,1fr) auto;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:16px;padding:10px;margin-bottom:18px}
+.month-list{display:grid;grid-template-columns:repeat(12,minmax(48px,1fr));gap:6px;overflow-x:auto}
+.month-chip,.year-btn{border:0;background:#f3f6f3;border-radius:10px;min-height:40px;font-weight:800;color:#69746d}
+.month-chip.active{background:var(--green);color:#fff}
+.year-btn{width:40px;font-size:24px}
+.month-year{font-size:16px}
+.hero{background:linear-gradient(135deg,#173f31,#315c48);color:#fff;border-radius:22px;padding:24px;display:flex;justify-content:space-between;gap:20px;align-items:center}
+.hero strong{font-size:36px;display:block;margin-top:6px}
+.hero small{color:#dce8e1;font-weight:800;letter-spacing:.8px}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0}
+.card{background:#fff;border:1px solid var(--line);border-radius:15px;padding:16px}
+.card small{display:block;font-size:10px;font-weight:900;letter-spacing:.8px}
+.card b{display:block;font-size:23px;margin-top:6px}
+.income{color:#27825d}.expense{color:var(--red)}.transfer{color:var(--blue)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.wallet-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0}
+.wallet-card{background:#fff;border:1px solid var(--line);border-radius:15px;padding:15px;position:relative;overflow:hidden}
+.wallet-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--green)}
+.wallet-card.cash::before{background:var(--gold)}
+.wallet-card.child::before{background:#8f70a8}
+.wallet-card.fx::before{background:var(--blue)}
+.wallet-card small{display:block;font-weight:800}
+.wallet-card strong{display:block;font-size:22px;margin-top:7px}
+.wallet-card .pln{font-size:11px;color:var(--muted);margin-top:4px}
+.category{display:grid;grid-template-columns:30px minmax(0,1fr) auto;align-items:center;gap:8px;padding:10px 0;border-bottom:1px dotted var(--line)}
+.category:last-child{border-bottom:0}
+.category span:first-child{font-size:19px}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:9px;align-items:center;padding:11px 0;border-bottom:1px solid #ebe7dc}
+.row:last-child{border-bottom:0}
+.row b,.row small{display:block}
+.row>div{min-width:0}
+.btn,.primary{border:1px solid var(--line);background:#fff;border-radius:11px;padding:10px 13px;font-weight:800}
+.primary{background:var(--green);color:#fff;border-color:var(--green)}
+.danger{color:#a7493f}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.filters{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin:14px 0}
+input,select,textarea{width:100%;border:1px solid #cbc5b8;border-radius:10px;background:#fff;padding:11px}
+textarea{resize:vertical}
+.form{display:grid;gap:12px}
+.form label{display:grid;gap:6px;font-weight:800}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.overlay{position:fixed;inset:0;background:#11201999;display:grid;place-items:center;padding:14px;z-index:50}
+.modal{background:#fffdf8;width:min(690px,100%);max-height:92vh;overflow:auto;border-radius:20px;padding:20px}
+.modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}
+.close{border:0;background:transparent;font-size:25px}
+.quick{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.quick button{min-height:74px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.toast{position:fixed;top:16px;right:16px;z-index:80;background:var(--green2);color:#fff;padding:12px 15px;border-radius:11px}
+.hidden{display:none!important}
+.receipt-preview{max-width:100%;max-height:260px;border-radius:12px;object-fit:contain;background:#eee}
+.table-wrap{overflow:auto}
+table{border-collapse:collapse;width:100%;min-width:520px}
+td,th{padding:10px;border-bottom:1px solid var(--line);text-align:right}
+td:first-child,th:first-child{text-align:left}
+.bill{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:11px 0;border-bottom:1px solid #ebe7dc}
+.settings{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.tag{display:inline-flex;align-items:center;gap:6px;padding:7px 9px;border-radius:999px;background:#e7efe9;margin:4px}
+.tag button{border:0;background:transparent}
+.note{margin-top:14px}
+.wallet-settings-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.wallet-badge{display:inline-block;border-radius:999px;padding:4px 8px;background:#edf1ed;font-size:10px;font-weight:900;color:#617068;margin-top:5px}
+.transfer-arrow{font-size:20px;color:var(--blue);font-weight:900}
+
+@media(max-width:1000px){.wallet-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){
+  html,body{max-width:100%;overflow-x:hidden}
+  .app{display:block}
+  aside{position:fixed;z-index:30;inset:auto 0 0;height:auto;padding:6px 6px calc(6px + env(safe-area-inset-bottom));border:0;border-top:1px solid var(--line)}
+  .logo{display:none}
+  nav{grid-template-columns:repeat(4,1fr);gap:4px}
+  nav button{text-align:center;padding:10px 3px;font-size:10px;line-height:1.15}
+  main{padding:12px 10px calc(82px + env(safe-area-inset-bottom))}
+  header{margin-bottom:9px}
+  h1{font-size:22px}
+  .month-strip{grid-template-columns:auto 1fr auto;gap:5px;padding:7px;margin-bottom:12px}
+  .month-year{grid-column:1/-1;text-align:center;font-size:14px}
+  .year-btn:first-child{grid-row:2;grid-column:1}
+  .month-list{grid-row:2;grid-column:2;display:flex;gap:5px;scroll-snap-type:x proximity}
+  .month-chip{min-width:52px;min-height:38px;scroll-snap-align:center}
+  .year-btn:last-child{grid-row:2;grid-column:3}
+  .hero{padding:17px;border-radius:15px}
+  .hero strong{font-size:28px}
+  .hero .hero-art{display:none}
+  .summary{grid-template-columns:1fr 1fr;gap:8px}
+  .summary .card:first-child{grid-column:1/-1}
+  .card{padding:13px}
+  .card b{font-size:20px}
+  .wallet-grid{grid-template-columns:1fr 1fr;gap:8px}
+  .wallet-card{padding:13px}
+  .wallet-card strong{font-size:18px}
+  .grid2,.settings{grid-template-columns:1fr;gap:10px}
+  .panel{padding:14px;border-radius:13px}
+  .panel h2{font-size:17px}
+  .row{grid-template-columns:minmax(0,1fr) auto;gap:7px}
+  .row .edit-actions{grid-column:1/-1;display:flex;gap:6px}
+  .filters{grid-template-columns:1fr;gap:7px}
+  .actions{display:grid;grid-template-columns:1fr 1fr}
+  .actions button{min-height:45px}
+  .cols{grid-template-columns:1fr}
+  .overlay{align-items:end;padding:0}
+  .modal{width:100%;max-width:none;max-height:91dvh;border-radius:18px 18px 0 0;padding:16px;padding-bottom:calc(18px + env(safe-area-inset-bottom))}
+  .quick{grid-template-columns:1fr 1fr}
+  .bill{grid-template-columns:minmax(0,1fr) auto}
+  .bill .bill-actions{grid-column:1/-1;display:flex;gap:6px}
+  .wallet-settings-row{grid-template-columns:minmax(0,1fr) auto}
+  .wallet-settings-row .wallet-actions{grid-column:1/-1;display:flex;gap:6px}
+}
+@media(max-width:380px){
+  .summary,.wallet-grid{grid-template-columns:1fr}
+  .summary .card:first-child{grid-column:auto}
+  .actions{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <div class="logo">◉ Wspólny Portfel<small>WSPÓLNE FINANSE</small></div>
+    <nav id="nav">
+      <button data-tab="home" class="active">Pulpit</button>
+      <button data-tab="transactions">Transakcje</button>
+      <button data-tab="summary">Podsumowanie</button>
+      <button data-tab="settings">Ustawienia</button>
+    </nav>
+  </aside>
+  <main>
+    <header>
+      <div><h1 id="title">Wspólny Portfel</h1><div class="muted">Wspólny budżet domowy · offline</div></div>
+    </header>
+    <div id="monthBar"></div>
+    <div id="view"></div>
+  </main>
+</div>
+<div id="modal"></div><div id="toast"></div>
+
+<script>
+const K={
+  items:'wp-items-v2',trash:'wp-trash-v2',cats:'wp-cats-v2',incs:'wp-incs-v2',
+  bills:'wp-bills-v2',notes:'wp-notes-v2',settings:'wp-settings-v2',wallets:'wp-wallets-v2'
+};
+const catsDefault=['Zakupy spożywcze','Jedzenie na mieście','Rachunki i media','Dom i ogród','Dziecko','Auto i paliwo','Zdrowie i apteka','Ubrania','Kosmetyki','Rozrywka','Wyjazdy i wakacje','Prezenty','Ubezpieczenia','Raty i kredyty','Zwierzęta','Inne'];
+const incsDefault=['Wypłata','Premia','Dodatkowe zlecenie','Zwrot pieniędzy','Sprzedaż rzeczy','Prezent','Inny przychód'];
+const walletDefaults=[
+  {id:'wallet-main',name:'Konto wspólne',currency:'PLN',kind:'account',opening:0,rate:1,active:true},
+  {id:'wallet-cash',name:'Gotówka',currency:'PLN',kind:'cash',opening:0,rate:1,active:true},
+  {id:'wallet-olek',name:'Pieniądze Olka',currency:'PLN',kind:'child',opening:0,rate:1,active:true}
+];
+const load=(k,f)=>{try{const v=JSON.parse(localStorage.getItem(k));return v??f}catch{return f}};
+const save=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+const uid=()=>crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(16).slice(2);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const cash=(n,c='PLN')=>Number(n||0).toLocaleString('pl-PL',{style:'currency',currency:c});
+const fmtDate=v=>v?new Date(v+'T12:00').toLocaleDateString('pl-PL'):'—';
+const today=()=>new Date().toISOString().slice(0,10);
+const currentMonth=()=>new Date().toISOString().slice(0,7);
+
+let S={
+  items:load(K.items,[]),trash:load(K.trash,[]),cats:load(K.cats,catsDefault),incs:load(K.incs,incsDefault),
+  bills:load(K.bills,[]),notes:load(K.notes,{}),settings:load(K.settings,{}),wallets:load(K.wallets,walletDefaults),
+  month:currentMonth(),tab:'home'
+};
+
+/* migracja z poprzedniej wersji */
+(function migrateV1(){
+  if(S.items.length)return;
+  const oldItems=load('wp-items-v1',[]);
+  if(oldItems.length){
+    S.items=oldItems.map(x=>({...x,walletId:x.walletId||'wallet-main'}));
+    S.cats=load('wp-cats-v1',S.cats);S.incs=load('wp-incs-v1',S.incs);S.bills=load('wp-bills-v1',S.bills);S.notes=load('wp-notes-v1',S.notes);
+    persist()
+  }
+})();
+
+function persist(){save(K.items,S.items);save(K.trash,S.trash);save(K.cats,S.cats);save(K.incs,S.incs);save(K.bills,S.bills);save(K.notes,S.notes);save(K.settings,S.settings);save(K.wallets,S.wallets)}
+function wallet(id){return S.wallets.find(w=>w.id===id)||S.wallets[0]}
+function activeWallets(){return S.wallets.filter(w=>w.active!==false)}
+function walletClass(w){return w.kind==='cash'?'cash':w.kind==='child'?'child':w.currency!=='PLN'?'fx':''}
+function walletBalance(w){
+  let b=Number(w.opening||0);
+  S.items.forEach(x=>{
+    if(x.type==='income'&&x.walletId===w.id)b+=Number(x.amount||0);
+    if(x.type==='expense'&&x.walletId===w.id)b-=Number(x.amount||0);
+    if(x.type==='transfer'){
+      if(x.fromWalletId===w.id)b-=Number(x.amountFrom||0);
+      if(x.toWalletId===w.id)b+=Number(x.amountTo||0)
+    }
+  });
+  return b
+}
+function walletBalanceAtMonth(w,k){
+  let b=Number(w.opening||0);
+  S.items.filter(x=>x.date<=k+'-31').forEach(x=>{
+    if(x.type==='income'&&x.walletId===w.id)b+=Number(x.amount||0);
+    if(x.type==='expense'&&x.walletId===w.id)b-=Number(x.amount||0);
+    if(x.type==='transfer'){if(x.fromWalletId===w.id)b-=Number(x.amountFrom||0);if(x.toWalletId===w.id)b+=Number(x.amountTo||0)}
+  });
+  return b
+}
+function totalPln(){return activeWallets().reduce((s,w)=>s+walletBalance(w)*(w.currency==='PLN'?1:Number(w.rate||0)),0)}
+function monthItems(){return S.items.filter(x=>x.date?.startsWith(S.month))}
+function monthStats(){
+  const a=monthItems();return{
+    income:a.filter(x=>x.type==='income').reduce((s,x)=>s+(wallet(x.walletId).currency==='PLN'?x.amount:x.amount*Number(wallet(x.walletId).rate||0)),0),
+    expense:a.filter(x=>x.type==='expense').reduce((s,x)=>s+(wallet(x.walletId).currency==='PLN'?x.amount:x.amount*Number(wallet(x.walletId).rate||0)),0)
+  }
+}
+function toast(t){document.getElementById('toast').innerHTML=`<div class="toast">${esc(t)}</div>`;setTimeout(()=>document.getElementById('toast').innerHTML='',2200)}
+function icon(n=''){n=n.toLowerCase();if(/spoży|zakup/.test(n))return'🛒';if(/mieście/.test(n))return'🍔';if(/rach|media/.test(n))return'🏠';if(/dom/.test(n))return'🪴';if(/dziecko/.test(n))return'🧸';if(/auto|paliwo/.test(n))return'🚗';if(/zdrow|aptek/.test(n))return'💊';if(/ubran/.test(n))return'👕';if(/kosmet/.test(n))return'🛍️';if(/rozryw/.test(n))return'🎬';if(/wyjaz|wakac/.test(n))return'🏖️';if(/ubez/.test(n))return'🛡️';if(/rat|kred/.test(n))return'🏦';return'🧾'}
+
+function renderMonthBar(){
+  const d=new Date(S.month+'-01T12:00'),year=d.getFullYear(),names=['Sty','Lut','Mar','Kwi','Maj','Cze','Lip','Sie','Wrz','Paź','Lis','Gru'];
+  document.getElementById('monthBar').innerHTML=`<section class="month-strip"><button class="year-btn" onclick="changeYear(-1)">‹</button><strong class="month-year">${year}</strong><div class="month-list">${names.map((n,i)=>{const k=year+'-'+String(i+1).padStart(2,'0');return `<button class="month-chip ${k===S.month?'active':''}" onclick="selectMonth('${k}')">${n}</button>`}).join('')}</div><button class="year-btn" onclick="changeYear(1)">›</button></section>`;
+  requestAnimationFrame(()=>document.querySelector('.month-chip.active')?.scrollIntoView({block:'nearest',inline:'center'}))
+}
+function selectMonth(k){S.month=k;render()}
+function changeYear(v){const d=new Date(S.month+'-01T12:00');d.setFullYear(d.getFullYear()+v);S.month=d.toISOString().slice(0,7);render()}
+
+function walletCards(){
+  return `<div class="wallet-grid">${activeWallets().map(w=>{
+    const b=walletBalance(w),pln=b*(w.currency==='PLN'?1:Number(w.rate||0));
+    return `<div class="wallet-card ${walletClass(w)}"><small>${esc(w.name)} · ${w.currency}</small><strong>${cash(b,w.currency)}</strong>${w.currency!=='PLN'?`<div class="pln">≈ ${cash(pln,'PLN')} · kurs ${Number(w.rate||0).toLocaleString('pl-PL')}</div>`:''}<div class="wallet-badge">${w.kind==='child'?'DZIECKO':w.kind==='cash'?'GOTÓWKA':w.currency!=='PLN'?'WALUTA':'KONTO'}</div></div>`}).join('')}</div>`
+}
+function rows(a,edit=false){
+  return a.length?a.map(x=>{
+    if(x.type==='transfer'){
+      const fw=wallet(x.fromWalletId),tw=wallet(x.toWalletId);
+      return `<div class="row"><div><b>↔ ${esc(x.note||'Transfer między portfelami')}</b><small>${esc(fw.name)} → ${esc(tw.name)} · ${fmtDate(x.date)}</small></div><strong class="transfer">${cash(x.amountFrom,fw.currency)} → ${cash(x.amountTo,tw.currency)}</strong>${edit?`<div class="edit-actions"><button class="btn danger" onclick="removeTx('${x.id}')">Usuń</button></div>`:''}</div>`
+    }
+    const w=wallet(x.walletId);
+    return `<div class="row"><div><b>${x.receipt?'📎 ':''}${esc(x.merchant||x.description||x.category)}</b><small>${esc(x.category)} · ${fmtDate(x.date)} · ${esc(w.name)}</small></div><strong class="${x.type}">${x.type==='income'?'+':'−'}${cash(x.amount,w.currency)}</strong>${edit?`<div class="edit-actions"><button class="btn" onclick="txModal('${x.type}','${x.id}')">Edytuj</button><button class="btn danger" onclick="removeTx('${x.id}')">Usuń</button></div>`:''}</div>`
+  }).join(''):'<p class="muted">Brak transakcji.</p>'
+}
+
+function home(){
+  const a=monthItems(),z=monthStats(),cats={};
+  a.filter(x=>x.type==='expense').forEach(x=>{const w=wallet(x.walletId),pln=x.amount*(w.currency==='PLN'?1:Number(w.rate||0));cats[x.category]=(cats[x.category]||0)+pln});
+  const top=Object.entries(cats).sort((a,b)=>b[1]-a[1]).slice(0,8),last=a.slice().sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,6);
+  const bills=S.bills.filter(x=>x.active!==false).sort((a,b)=>a.nextDate.localeCompare(b.nextDate)).slice(0,5);
+  return `<section class="hero"><div><small>ŁĄCZNIE WE WSZYSTKICH PORTFELACH</small><strong>${cash(totalPln(),'PLN')}</strong><span>wartość orientacyjna w PLN</span></div><div class="hero-art">💳 💵 🧸 💶</div></section>
+  ${walletCards()}
+  <div class="summary"><div class="card"><small>PRZYCHODY W MIESIĄCU</small><b class="income">${cash(z.income)}</b></div><div class="card"><small>WYDATKI W MIESIĄCU</small><b class="expense">${cash(z.expense)}</b></div><div class="card"><small>BILANS MIESIĄCA</small><b>${cash(z.income-z.expense)}</b></div></div>
+  <div class="grid2"><section class="panel"><h2>Największe kategorie</h2>${top.length?top.map(([n,v])=>`<div class="category"><span>${icon(n)}</span><b>${esc(n)}</b><strong>${cash(v)}</strong></div>`).join(''):'<p class="muted">Brak wydatków.</p>'}</section><section class="panel"><h2>Ostatnie transakcje</h2>${rows(last)}</section></div>
+  <section class="panel note"><h2>Notatka do miesiąca</h2><textarea id="monthNote" rows="3" placeholder="Np. wakacje, większy zakup, ważna opłata…">${esc(S.notes[S.month]||'')}</textarea><button class="btn" style="margin-top:8px" onclick="saveNote()">Zapisz notatkę</button></section>
+  ${bills.length?`<section class="panel note"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div><h2>Najbliższe rachunki i subskrypcje</h2><p class="muted">Telefon, internet, media, ubezpieczenia i serwisy</p></div><button class="primary" onclick="billModal()">+ Dodaj</button></div>${bills.map(b=>billRow(b)).join('')}</section>`:''}
+  <div class="actions"><button class="primary" onclick="txModal('expense')">+ Wydatek</button><button class="btn" onclick="txModal('income')">+ Przychód</button><button class="btn" onclick="transferModal()">↔ Transfer</button><button class="btn" onclick="walletModal()">+ Portfel / waluta</button></div>`
+}
+function saveNote(){S.notes[S.month]=document.getElementById('monthNote').value;persist();toast('Notatka zapisana')}
+
+function transactions(){
+  return `<section class="panel"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div><h2>Wszystkie operacje</h2><p class="muted" id="count"></p></div><button class="primary" onclick="txModal('expense')">+ Dodaj</button></div><div class="filters"><input id="q" placeholder="Szukaj"><select id="ft"><option value="">Wszystkie typy</option><option value="expense">Wydatki</option><option value="income">Przychody</option><option value="transfer">Transfery</option></select><select id="fc"><option value="">Wszystkie kategorie</option>${S.cats.map(x=>`<option>${esc(x)}</option>`).join('')}</select><select id="fw"><option value="">Wszystkie portfele</option>${activeWallets().map(w=>`<option value="${w.id}">${esc(w.name)} · ${w.currency}</option>`).join('')}</select></div><div id="txRows"></div></section>`
+}
+function filter(){
+  const q=document.getElementById('q')?.value.toLowerCase()||'',t=document.getElementById('ft')?.value||'',c=document.getElementById('fc')?.value||'',wid=document.getElementById('fw')?.value||'';
+  const a=monthItems().filter(x=>{
+    const search=!q||JSON.stringify(x).toLowerCase().includes(q);
+    const type=!t||x.type===t;
+    const cat=!c||x.category===c;
+    const wal=!wid||(x.walletId===wid||x.fromWalletId===wid||x.toWalletId===wid);
+    return search&&type&&cat&&wal
+  });
+  document.getElementById('txRows').innerHTML=rows(a,true);document.getElementById('count').textContent=a.length+' z '+monthItems().length+' pozycji'
+}
+
+function summary(){
+  const z=monthStats(),all=activeWallets();
+  return `<div class="summary"><div class="card"><small>ŁĄCZNA WARTOŚĆ</small><b>${cash(totalPln())}</b></div><div class="card"><small>PRZYCHODY</small><b class="income">${cash(z.income)}</b></div><div class="card"><small>WYDATKI</small><b class="expense">${cash(z.expense)}</b></div></div>
+  <section class="panel"><h2>Stan portfeli</h2><div class="table-wrap"><table><tr><th>Portfel</th><th>Waluta</th><th>Stan</th><th>Wartość PLN</th></tr>${all.map(w=>{const b=walletBalance(w),pln=b*(w.currency==='PLN'?1:Number(w.rate||0));return `<tr><td>${esc(w.name)}</td><td>${w.currency}</td><td>${cash(b,w.currency)}</td><td>${cash(pln)}</td></tr>`}).join('')}</table></div></section>`
+}
+
+function settings(){
+  return `<div class="settings">
+    <section class="panel" style="grid-column:1/-1"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div><h2>Portfele, konta i waluty</h2><p class="muted">Każdy ma własne saldo. Waluty mają ręczny kurs do PLN.</p></div><button class="primary" onclick="walletModal()">+ Dodaj portfel</button></div><div>${S.wallets.map(w=>walletSettingsRow(w)).join('')}</div></section>
+    <section class="panel"><h2>Rachunki i subskrypcje</h2><button class="primary" onclick="billModal()">+ Dodaj opłatę</button><div style="margin-top:10px">${S.bills.length?S.bills.map(b=>billRow(b,true)).join(''):'<p class="muted">Brak opłat.</p>'}</div></section>
+    ${editor('Kategorie wydatków','cats')}${editor('Rodzaje przychodów','incs')}
+    <section class="panel"><h2>Dane</h2><p class="muted">Dane są lokalne w tej przeglądarce.</p><button class="btn" onclick="exportData()">Eksport JSON</button> <button class="btn" onclick="document.getElementById('importFile').click()">Import JSON</button><input class="hidden" id="importFile" type="file" accept=".json" onchange="importData(event)"></section>
+  </div>`
+}
+function walletSettingsRow(w){
+  const b=walletBalance(w);
+  return `<div class="wallet-settings-row"><div><b>${esc(w.name)} · ${w.currency}</b><small>${cash(b,w.currency)}${w.currency!=='PLN'?` · kurs ${w.rate} PLN`:''}</small></div><strong>${w.active===false?'WYŁĄCZONY':''}</strong><div class="wallet-actions"><button class="btn" onclick="walletModal('${w.id}')">Edytuj</button>${!['wallet-main','wallet-cash','wallet-olek'].includes(w.id)?`<button class="btn danger" onclick="deleteWallet('${w.id}')">Usuń</button>`:''}</div></div>`
+}
+function editor(title,key){return `<section class="panel"><h2>${title}</h2><form class="actions" onsubmit="addSetting(event,'${key}')"><input name="name" placeholder="Nowa pozycja" required><button class="primary">Dodaj</button></form><div>${S[key].map(x=>`<span class="tag">${esc(x)} <button onclick="delSetting('${key}','${encodeURIComponent(x)}')">×</button></span>`).join('')}</div></section>`}
+function addSetting(e,key){e.preventDefault();const n=new FormData(e.target).get('name').trim();if(n&&!S[key].some(x=>x.toLowerCase()===n.toLowerCase()))S[key].push(n);persist();render()}
+function delSetting(key,n){n=decodeURIComponent(n);if(S[key].length>1)S[key]=S[key].filter(x=>x!==n);persist();render()}
+
+function openModal(title,body){document.getElementById('modal').innerHTML=`<div class="overlay"><div class="modal"><div class="modal-head"><h2>${esc(title)}</h2><button class="close" onclick="closeModal()">×</button></div>${body}</div></div>`}
+function closeModal(){document.getElementById('modal').innerHTML=''}
+
+function walletModal(id=''){
+  const w=S.wallets.find(x=>x.id===id)||{name:'',currency:'PLN',kind:'account',opening:0,rate:1,active:true};
+  openModal(id?'Edytuj portfel':'Nowy portfel / konto',`<form class="form" onsubmit="saveWallet(event,'${id}')"><label>Nazwa<input name="name" required value="${esc(w.name)}" placeholder="np. Euro na wakacje"></label><div class="cols"><label>Rodzaj<select name="kind"><option value="account" ${w.kind==='account'?'selected':''}>Konto</option><option value="cash" ${w.kind==='cash'?'selected':''}>Gotówka</option><option value="child" ${w.kind==='child'?'selected':''}>Pieniądze dziecka</option><option value="other" ${w.kind==='other'?'selected':''}>Inne</option></select></label><label>Waluta<select name="currency" onchange="toggleRate(this.value)">${['PLN','EUR','USD','GBP','CHF','CZK'].map(c=>`<option ${c===w.currency?'selected':''}>${c}</option>`).join('')}</select></label></div><div class="cols"><label>Saldo początkowe<input name="opening" inputmode="decimal" value="${w.opening||0}"></label><label id="rateLabel" class="${w.currency==='PLN'?'hidden':''}">Kurs do PLN<input name="rate" inputmode="decimal" value="${w.rate||1}" placeholder="np. 4,25"></label></div><label style="display:flex;gap:8px;align-items:center"><input style="width:auto" type="checkbox" name="active" ${w.active!==false?'checked':''}> Aktywny</label><button class="primary">Zapisz portfel</button></form>`)
+}
+function toggleRate(c){document.getElementById('rateLabel').classList.toggle('hidden',c==='PLN')}
+function saveWallet(e,id){e.preventDefault();const d=new FormData(e.target),currency=d.get('currency'),obj={id:id||uid(),name:d.get('name'),kind:d.get('kind'),currency,opening:Number(String(d.get('opening')).replace(',','.'))||0,rate:currency==='PLN'?1:Number(String(d.get('rate')).replace(',','.'))||0,active:d.get('active')==='on'};if(id)S.wallets=S.wallets.map(w=>w.id===id?obj:w);else S.wallets.push(obj);persist();closeModal();render();toast('Portfel zapisany')}
+function deleteWallet(id){if(S.items.some(x=>x.walletId===id||x.fromWalletId===id||x.toWalletId===id))return alert('Ten portfel ma już transakcje. Zamiast usuwać, wyłącz go w edycji.');if(confirm('Usunąć portfel?')){S.wallets=S.wallets.filter(w=>w.id!==id);persist();render()}}
+
+let draftReceipt='';
+function txModal(type='expense',id=''){
+  const x=S.items.find(i=>i.id===id)||{type,date:today(),category:type==='income'?S.incs[0]:S.cats[0],amount:'',merchant:'',description:'',receipt:'',walletId:activeWallets()[0]?.id};
+  draftReceipt=x.receipt||'';
+  openModal(id?'Edytuj transakcję':'Nowa transakcja',`<form class="form" onsubmit="saveTx(event,'${id}')"><div class="cols"><label>Typ<select name="type" onchange="toggleTxType(this.value)"><option value="expense" ${x.type==='expense'?'selected':''}>Wydatek</option><option value="income" ${x.type==='income'?'selected':''}>Przychód</option></select></label><label>Portfel<select name="walletId">${activeWallets().map(w=>`<option value="${w.id}" ${w.id===x.walletId?'selected':''}>${esc(w.name)} · ${w.currency}</option>`).join('')}</select></label></div><div class="cols"><label>Kwota<input name="amount" required inputmode="decimal" value="${x.amount||''}"></label><label>Data<input type="date" name="date" required value="${x.date}"></label></div><label>Kategoria<select id="txCategory" name="category">${(x.type==='income'?S.incs:S.cats).map(c=>`<option ${c===x.category?'selected':''}>${esc(c)}</option>`).join('')}</select></label><div id="expenseOnly" class="${x.type==='income'?'hidden':''}"><label>Sklep / miejsce<input name="merchant" value="${esc(x.merchant||'')}"></label><label>Opis<input name="description" value="${esc(x.description||'')}"></label><label>Paragon / zdjęcie<input type="file" accept="image/*" capture="environment" onchange="receiptFile(event)"></label><div id="receiptPreview">${draftReceipt?`<img class="receipt-preview" src="${draftReceipt}">`:''}</div></div><button class="primary">Zapisz</button></form>`)
+}
+function toggleTxType(t){document.getElementById('expenseOnly').classList.toggle('hidden',t==='income');document.getElementById('txCategory').innerHTML=(t==='income'?S.incs:S.cats).map(c=>`<option>${esc(c)}</option>`).join('')}
+function receiptFile(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const max=1400,scale=Math.min(1,max/im.width),c=document.createElement('canvas');c.width=Math.round(im.width*scale);c.height=Math.round(im.height*scale);c.getContext('2d').drawImage(im,0,0,c.width,c.height);draftReceipt=c.toDataURL('image/jpeg',.72);document.getElementById('receiptPreview').innerHTML=`<img class="receipt-preview" src="${draftReceipt}">`};im.src=r.result};r.readAsDataURL(f)}
+function saveTx(e,id){e.preventDefault();const d=new FormData(e.target),type=d.get('type'),amount=Number(String(d.get('amount')).replace(',','.'));if(!amount||amount<0)return alert('Podaj poprawną kwotę.');const item={id:id||uid(),type,amount,date:d.get('date'),category:d.get('category'),walletId:d.get('walletId'),merchant:type==='expense'?d.get('merchant'):'',description:type==='income'?d.get('category'):d.get('description'),receipt:type==='expense'?draftReceipt:''};if(id)S.items=S.items.map(x=>x.id===id?item:x);else S.items.unshift(item);persist();closeModal();render();toast('Zapisano')}
+function removeTx(id){if(!confirm('Usunąć tę operację?'))return;S.items=S.items.filter(i=>i.id!==id);persist();render()}
+
+function transferModal(){
+  const ws=activeWallets();if(ws.length<2)return alert('Dodaj co najmniej dwa portfele.');
+  openModal('Transfer między portfelami',`<form class="form" onsubmit="saveTransfer(event)"><div class="cols"><label>Z portfela<select name="from">${ws.map(w=>`<option value="${w.id}">${esc(w.name)} · ${w.currency}</option>`).join('')}</select></label><label>Do portfela<select name="to">${ws.map((w,i)=>`<option value="${w.id}" ${i===1?'selected':''}>${esc(w.name)} · ${w.currency}</option>`).join('')}</select></label></div><div class="cols"><label>Kwota pobrana<input name="amountFrom" required inputmode="decimal"></label><label>Kwota dodana<input name="amountTo" required inputmode="decimal"></label></div><label>Data<input name="date" type="date" required value="${today()}"></label><label>Opis<input name="note" placeholder="np. Wypłata z bankomatu / wymiana EUR"></label><p class="muted">Przy tej samej walucie wpisz tę samą kwotę. Przy wymianie walut wpisz faktycznie pobraną i faktycznie otrzymaną kwotę.</p><button class="primary">Zapisz transfer</button></form>`)
+}
+function saveTransfer(e){e.preventDefault();const d=new FormData(e.target);if(d.get('from')===d.get('to'))return alert('Wybierz dwa różne portfele.');const af=Number(String(d.get('amountFrom')).replace(',','.')),at=Number(String(d.get('amountTo')).replace(',','.'));if(af<=0||at<=0)return alert('Podaj poprawne kwoty.');S.items.unshift({id:uid(),type:'transfer',date:d.get('date'),fromWalletId:d.get('from'),toWalletId:d.get('to'),amountFrom:af,amountTo:at,note:d.get('note')||'Transfer'});persist();closeModal();render();toast('Transfer zapisany')}
+
+function billRow(b,manage=false){const days=Math.ceil((new Date(b.nextDate+'T23:59')-new Date())/86400000),status=days<0?`zaległe ${Math.abs(days)} dni`:days===0?'dzisiaj':`za ${days} dni`;const w=wallet(b.walletId);return `<div class="bill"><div><b>${esc(b.name)}</b><small>${cash(b.amount,w.currency)} · ${esc(w.name)} · ${fmtDate(b.nextDate)} · ${status}</small></div><strong>${cash(b.amount,w.currency)}</strong><div class="bill-actions"><button class="primary" onclick="payBill('${b.id}')">Zapłacone</button>${manage?` <button class="btn" onclick="billModal('${b.id}')">Edytuj</button> <button class="btn danger" onclick="deleteBill('${b.id}')">Usuń</button>`:''}</div></div>`}
+function billModal(id=''){const b=S.bills.find(x=>x.id===id)||{name:'',amount:'',category:'Rachunki i media',nextDate:today(),frequency:'monthly',active:true,walletId:activeWallets()[0]?.id};openModal(id?'Edytuj opłatę':'Nowa opłata',`<form class="form" onsubmit="saveBill(event,'${id}')"><label>Nazwa<input name="name" required value="${esc(b.name)}"></label><div class="cols"><label>Portfel<select name="walletId">${activeWallets().map(w=>`<option value="${w.id}" ${w.id===b.walletId?'selected':''}>${esc(w.name)} · ${w.currency}</option>`).join('')}</select></label><label>Kwota<input name="amount" required inputmode="decimal" value="${b.amount}"></label></div><div class="cols"><label>Kategoria<select name="category">${S.cats.map(x=>`<option ${x===b.category?'selected':''}>${esc(x)}</option>`).join('')}</select></label><label>Termin<input type="date" name="nextDate" required value="${b.nextDate}"></label></div><label>Powtarzanie<select name="frequency"><option value="monthly" ${b.frequency==='monthly'?'selected':''}>Co miesiąc</option><option value="quarterly" ${b.frequency==='quarterly'?'selected':''}>Co 3 miesiące</option><option value="yearly" ${b.frequency==='yearly'?'selected':''}>Co rok</option></select></label><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" name="active" ${b.active!==false?'checked':''} style="width:auto"> Aktywna</label><button class="primary">Zapisz</button></form>`)}
+function saveBill(e,id){e.preventDefault();const d=new FormData(e.target),b={id:id||uid(),name:d.get('name'),amount:Number(String(d.get('amount')).replace(',','.')),category:d.get('category'),walletId:d.get('walletId'),nextDate:d.get('nextDate'),frequency:d.get('frequency'),active:d.get('active')==='on'};if(id)S.bills=S.bills.map(x=>x.id===id?b:x);else S.bills.unshift(b);persist();closeModal();render();toast('Opłata zapisana')}
+function payBill(id){const b=S.bills.find(x=>x.id===id);if(!b)return;S.items.unshift({id:uid(),type:'expense',amount:b.amount,date:b.nextDate,category:b.category,walletId:b.walletId,merchant:b.name,description:b.name,receipt:'',billId:id});const d=new Date(b.nextDate+'T12:00');d.setMonth(d.getMonth()+(b.frequency==='quarterly'?3:b.frequency==='yearly'?12:1));b.nextDate=d.toISOString().slice(0,10);persist();render();toast('Opłata dodana do wydatków')}
+function deleteBill(id){if(confirm('Usunąć tę opłatę?')){S.bills=S.bills.filter(x=>x.id!==id);persist();render()}}
+
+function exportData(){const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='wspolny-portfel-backup.json';a.click();URL.revokeObjectURL(a.href)}
+function importData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);['items','trash','cats','incs','bills','notes','settings','wallets'].forEach(k=>{if(d[k]!==undefined)S[k]=d[k]});persist();render();toast('Dane zaimportowane')}catch{alert('Nieprawidłowy plik JSON')}};r.readAsText(f)}
+
+function render(){
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===S.tab));
+  document.getElementById('title').textContent={home:'Wspólny Portfel',transactions:'Transakcje',summary:'Podsumowanie',settings:'Ustawienia'}[S.tab];
+  renderMonthBar();document.getElementById('view').innerHTML=S.tab==='home'?home():S.tab==='transactions'?transactions():S.tab==='summary'?summary():settings();persist();if(S.tab==='transactions')setTimeout(filter,0)
+}
+document.getElementById('nav').addEventListener('click',e=>{if(e.target.dataset.tab){S.tab=e.target.dataset.tab;render()}});
+document.addEventListener('input',e=>{if(['q','ft','fc','fw'].includes(e.target.id))filter()});
+render();
+</script>
+</body>
+</html>
