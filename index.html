@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#173f31">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Wspólny Portfel">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
 <title>Wspólny Portfel</title>
 <style>
 :root{
@@ -90,6 +95,14 @@ td:first-child,th:first-child{text-align:left}
 .wallet-settings-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
 .wallet-badge{display:inline-block;border-radius:999px;padding:4px 8px;background:#edf1ed;font-size:10px;font-weight:900;color:#617068;margin-top:5px}
 .transfer-arrow{font-size:20px;color:var(--blue);font-weight:900}
+.receipt-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+.alert-panel{border-left:6px solid var(--gold);margin-bottom:14px}
+.alert-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:9px 0;border-bottom:1px solid var(--line)}
+.alert-item:last-child{border:0}.alert-item.overdue strong{color:var(--red)}
+.annual-bars{display:flex;align-items:end;gap:7px;height:220px;padding-top:20px}.annual-bar{height:100%;flex:1;display:grid;grid-template-rows:1fr auto;align-items:end;text-align:center;gap:5px}.annual-bar i{display:block;min-height:2px;background:linear-gradient(#5f8b73,var(--green));border-radius:6px 6px 0 0}.annual-bar small{font-size:9px}
+.annual-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}.annual-cards .card b{font-size:19px}
+.detail-list{display:grid;gap:10px}.detail-line{display:grid;grid-template-columns:120px 1fr;gap:10px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.install-box{background:#edf4ef;border:1px solid #c9dbcf;border-radius:13px;padding:14px;margin-top:12px}
 
 @media(max-width:1000px){.wallet-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:760px){
@@ -134,6 +147,7 @@ td:first-child,th:first-child{text-align:left}
   .bill .bill-actions{grid-column:1/-1;display:flex;gap:6px}
   .wallet-settings-row{grid-template-columns:minmax(0,1fr) auto}
   .wallet-settings-row .wallet-actions{grid-column:1/-1;display:flex;gap:6px}
+  .annual-cards{grid-template-columns:1fr 1fr}.annual-bars{height:170px;gap:4px}.detail-line{grid-template-columns:1fr;gap:3px}
 }
 @media(max-width:380px){
   .summary,.wallet-grid{grid-template-columns:1fr}
@@ -235,6 +249,7 @@ function monthStats(){
   }
 }
 function toast(t){document.getElementById('toast').innerHTML=`<div class="toast">${esc(t)}</div>`;setTimeout(()=>document.getElementById('toast').innerHTML='',2200)}
+function daysUntil(v){return Math.ceil((new Date(v+'T23:59:59')-new Date())/86400000)}
 function icon(n=''){n=n.toLowerCase();if(/spoży|zakup/.test(n))return'🛒';if(/mieście/.test(n))return'🍔';if(/rach|media/.test(n))return'🏠';if(/dom/.test(n))return'🪴';if(/dziecko/.test(n))return'🧸';if(/auto|paliwo/.test(n))return'🚗';if(/zdrow|aptek/.test(n))return'💊';if(/ubran/.test(n))return'👕';if(/kosmet/.test(n))return'🛍️';if(/rozryw/.test(n))return'🎬';if(/wyjaz|wakac/.test(n))return'🏖️';if(/ubez/.test(n))return'🛡️';if(/rat|kred/.test(n))return'🏦';return'🧾'}
 
 function renderMonthBar(){
@@ -257,7 +272,7 @@ function rows(a,edit=false){
       return `<div class="row"><div><b>↔ ${esc(x.note||'Transfer między portfelami')}</b><small>${esc(fw.name)} → ${esc(tw.name)} · ${fmtDate(x.date)}</small></div><strong class="transfer">${cash(x.amountFrom,fw.currency)} → ${cash(x.amountTo,tw.currency)}</strong>${edit?`<div class="edit-actions"><button class="btn danger" onclick="removeTx('${x.id}')">Usuń</button></div>`:''}</div>`
     }
     const w=wallet(x.walletId);
-    return `<div class="row"><div><b>${x.receipt?'📎 ':''}${esc(x.merchant||x.description||x.category)}</b><small>${esc(x.category)} · ${fmtDate(x.date)} · ${esc(w.name)}</small></div><strong class="${x.type}">${x.type==='income'?'+':'−'}${cash(x.amount,w.currency)}</strong>${edit?`<div class="edit-actions"><button class="btn" onclick="txModal('${x.type}','${x.id}')">Edytuj</button><button class="btn danger" onclick="removeTx('${x.id}')">Usuń</button></div>`:''}</div>`
+    return `<div class="row"><div><b>${x.receipt?'📎 ':''}${esc(x.merchant||x.description||x.category)}</b><small>${esc(x.category)} · ${fmtDate(x.date)} · ${esc(w.name)}</small></div><strong class="${x.type}">${x.type==='income'?'+':'−'}${cash(x.amount,w.currency)}</strong><div class="edit-actions"><button class="btn" onclick="showTxDetails('${x.id}')">Szczegóły</button>${x.receipt?`<button class="btn" onclick="openReceipt('${x.id}')">Paragon</button>`:''}${edit?`<button class="btn" onclick="txModal('${x.type}','${x.id}')">Edytuj</button><button class="btn danger" onclick="removeTx('${x.id}')">Usuń</button>`:''}</div></div>`
   }).join(''):'<p class="muted">Brak transakcji.</p>'
 }
 
@@ -266,7 +281,8 @@ function home(){
   a.filter(x=>x.type==='expense').forEach(x=>{const w=wallet(x.walletId),pln=x.amount*(w.currency==='PLN'?1:Number(w.rate||0));cats[x.category]=(cats[x.category]||0)+pln});
   const top=Object.entries(cats).sort((a,b)=>b[1]-a[1]).slice(0,8),last=a.slice().sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,6);
   const bills=S.bills.filter(x=>x.active!==false).sort((a,b)=>a.nextDate.localeCompare(b.nextDate)).slice(0,5);
-  return `<section class="hero"><div><small>ŁĄCZNIE WE WSZYSTKICH PORTFELACH</small><strong>${cash(totalPln(),'PLN')}</strong><span>wartość orientacyjna w PLN</span></div><div class="hero-art">💳 💵 🧸 💶</div></section>
+  const alerts=S.bills.filter(x=>x.active!==false&&daysUntil(x.nextDate)<=3).sort((a,b)=>a.nextDate.localeCompare(b.nextDate));
+  return `${alerts.length?`<section class="panel alert-panel"><h2>🔔 Rachunki wymagające uwagi</h2>${alerts.map(b=>{const d=daysUntil(b.nextDate);return `<div class="alert-item ${d<0?'overdue':''}"><div><b>${esc(b.name)}</b><small>${d<0?`Zaległe od ${Math.abs(d)} dni`:d===0?'Termin dzisiaj':`Termin za ${d} dni`} · ${fmtDate(b.nextDate)}</small></div><strong>${cash(b.amount,wallet(b.walletId).currency)}</strong></div>`}).join('')}</section>`:''}<section class="hero"><div><small>ŁĄCZNIE WE WSZYSTKICH PORTFELACH</small><strong>${cash(totalPln(),'PLN')}</strong><span>wartość orientacyjna w PLN</span></div><div class="hero-art">💳 💵 🧸 💶</div></section>
   ${walletCards()}
   <div class="summary"><div class="card"><small>PRZYCHODY W MIESIĄCU</small><b class="income">${cash(z.income)}</b></div><div class="card"><small>WYDATKI W MIESIĄCU</small><b class="expense">${cash(z.expense)}</b></div><div class="card"><small>BILANS MIESIĄCA</small><b>${cash(z.income-z.expense)}</b></div></div>
   <div class="grid2"><section class="panel"><h2>Największe kategorie</h2>${top.length?top.map(([n,v])=>`<div class="category"><span>${icon(n)}</span><b>${esc(n)}</b><strong>${cash(v)}</strong></div>`).join(''):'<p class="muted">Brak wydatków.</p>'}</section><section class="panel"><h2>Ostatnie transakcje</h2>${rows(last)}</section></div>
@@ -292,9 +308,16 @@ function filter(){
 }
 
 function summary(){
-  const z=monthStats(),all=activeWallets();
+  const z=monthStats(),all=activeWallets(),year=Number(S.month.slice(0,4)),months=Array.from({length:12},(_,i)=>{
+    const key=year+'-'+String(i+1).padStart(2,'0'),items=S.items.filter(x=>x.date?.startsWith(key)),toPln=x=>{const w=wallet(x.walletId);return Number(x.amount||0)*(w.currency==='PLN'?1:Number(w.rate||0))};
+    return{income:items.filter(x=>x.type==='income').reduce((s,x)=>s+toPln(x),0),expense:items.filter(x=>x.type==='expense').reduce((s,x)=>s+toPln(x),0)}
+  }),annualIncome=months.reduce((s,x)=>s+x.income,0),annualExpense=months.reduce((s,x)=>s+x.expense,0),activeMonths=months.filter(x=>x.income||x.expense).length||1,maxExpense=Math.max(1,...months.map(x=>x.expense)),yearCats={};
+  S.items.filter(x=>x.type==='expense'&&x.date?.startsWith(String(year))).forEach(x=>{const w=wallet(x.walletId),v=x.amount*(w.currency==='PLN'?1:Number(w.rate||0));yearCats[x.category]=(yearCats[x.category]||0)+v});
+  const topCats=Object.entries(yearCats).sort((a,b)=>b[1]-a[1]).slice(0,8),monthNames=['Sty','Lut','Mar','Kwi','Maj','Cze','Lip','Sie','Wrz','Paź','Lis','Gru'];
   return `<div class="summary"><div class="card"><small>ŁĄCZNA WARTOŚĆ</small><b>${cash(totalPln())}</b></div><div class="card"><small>PRZYCHODY</small><b class="income">${cash(z.income)}</b></div><div class="card"><small>WYDATKI</small><b class="expense">${cash(z.expense)}</b></div></div>
-  <section class="panel"><h2>Stan portfeli</h2><div class="table-wrap"><table><tr><th>Portfel</th><th>Waluta</th><th>Stan</th><th>Wartość PLN</th></tr>${all.map(w=>{const b=walletBalance(w),pln=b*(w.currency==='PLN'?1:Number(w.rate||0));return `<tr><td>${esc(w.name)}</td><td>${w.currency}</td><td>${cash(b,w.currency)}</td><td>${cash(pln)}</td></tr>`}).join('')}</table></div></section>`
+  <div class="annual-cards"><div class="card"><small>PRZYCHODY ${year}</small><b class="income">${cash(annualIncome)}</b></div><div class="card"><small>WYDATKI ${year}</small><b class="expense">${cash(annualExpense)}</b></div><div class="card"><small>BILANS ROKU</small><b>${cash(annualIncome-annualExpense)}</b></div><div class="card"><small>ŚREDNIO / MIESIĄC</small><b>${cash(annualExpense/activeMonths)}</b></div></div>
+  <div class="grid2"><section class="panel"><h2>Wydatki w roku ${year}</h2><div class="annual-bars">${months.map((x,i)=>`<div class="annual-bar" title="${monthNames[i]}: ${cash(x.expense)}"><i style="height:${x.expense/maxExpense*100}%"></i><small>${monthNames[i]}</small></div>`).join('')}</div></section><section class="panel"><h2>Największe kategorie roku</h2>${topCats.length?topCats.map(([n,v])=>`<div class="category"><span>${icon(n)}</span><b>${esc(n)}</b><strong>${cash(v)}</strong></div>`).join(''):'<p class="muted">Brak wydatków w tym roku.</p>'}</section></div>
+  <section class="panel note"><h2>Stan portfeli</h2><div class="table-wrap"><table><tr><th>Portfel</th><th>Waluta</th><th>Stan</th><th>Wartość PLN</th></tr>${all.map(w=>{const b=walletBalance(w),pln=b*(w.currency==='PLN'?1:Number(w.rate||0));return `<tr><td>${esc(w.name)}</td><td>${w.currency}</td><td>${cash(b,w.currency)}</td><td>${cash(pln)}</td></tr>`}).join('')}</table></div></section>`
 }
 
 function settings(){
@@ -303,6 +326,7 @@ function settings(){
     <section class="panel"><h2>Rachunki i subskrypcje</h2><button class="primary" onclick="billModal()">+ Dodaj opłatę</button><div style="margin-top:10px">${S.bills.length?S.bills.map(b=>billRow(b,true)).join(''):'<p class="muted">Brak opłat.</p>'}</div></section>
     ${editor('Kategorie wydatków','cats')}${editor('Rodzaje przychodów','incs')}
     <section class="panel"><h2>Dane</h2><p class="muted">Dane są lokalne w tej przeglądarce.</p><button class="btn" onclick="exportData()">Eksport JSON</button> <button class="btn" onclick="document.getElementById('importFile').click()">Import JSON</button><input class="hidden" id="importFile" type="file" accept=".json" onchange="importData(event)"></section>
+    <section class="panel"><h2>Aplikacja na telefonie</h2><p class="muted">Zainstaluj Wspólny Portfel jak zwykłą aplikację i włącz przypomnienia o rachunkach.</p><div class="install-box"><button class="primary" id="installBtn" onclick="installPwa()">Zainstaluj aplikację</button> <button class="btn" onclick="enableNotifications()">Włącz powiadomienia</button><p class="muted" id="pwaStatus" style="margin-bottom:0"></p></div></section>
   </div>`
 }
 function walletSettingsRow(w){
@@ -328,10 +352,15 @@ let draftReceipt='';
 function txModal(type='expense',id=''){
   const x=S.items.find(i=>i.id===id)||{type,date:today(),category:type==='income'?S.incs[0]:S.cats[0],amount:'',merchant:'',description:'',receipt:'',walletId:activeWallets()[0]?.id};
   draftReceipt=x.receipt||'';
-  openModal(id?'Edytuj transakcję':'Nowa transakcja',`<form class="form" onsubmit="saveTx(event,'${id}')"><div class="cols"><label>Typ<select name="type" onchange="toggleTxType(this.value)"><option value="expense" ${x.type==='expense'?'selected':''}>Wydatek</option><option value="income" ${x.type==='income'?'selected':''}>Przychód</option></select></label><label>Portfel<select name="walletId">${activeWallets().map(w=>`<option value="${w.id}" ${w.id===x.walletId?'selected':''}>${esc(w.name)} · ${w.currency}</option>`).join('')}</select></label></div><div class="cols"><label>Kwota<input name="amount" required inputmode="decimal" value="${x.amount||''}"></label><label>Data<input type="date" name="date" required value="${x.date}"></label></div><label>Kategoria<select id="txCategory" name="category">${(x.type==='income'?S.incs:S.cats).map(c=>`<option ${c===x.category?'selected':''}>${esc(c)}</option>`).join('')}</select></label><div id="expenseOnly" class="${x.type==='income'?'hidden':''}"><label>Sklep / miejsce<input name="merchant" value="${esc(x.merchant||'')}"></label><label>Opis<input name="description" value="${esc(x.description||'')}"></label><label>Paragon / zdjęcie<input type="file" accept="image/*" capture="environment" onchange="receiptFile(event)"></label><div id="receiptPreview">${draftReceipt?`<img class="receipt-preview" src="${draftReceipt}">`:''}</div></div><button class="primary">Zapisz</button></form>`)
+  openModal(id?'Edytuj transakcję':'Nowa transakcja',`<form class="form" onsubmit="saveTx(event,'${id}')"><div class="cols"><label>Typ<select name="type" onchange="toggleTxType(this.value)"><option value="expense" ${x.type==='expense'?'selected':''}>Wydatek</option><option value="income" ${x.type==='income'?'selected':''}>Przychód</option></select></label><label>Portfel<select name="walletId">${activeWallets().map(w=>`<option value="${w.id}" ${w.id===x.walletId?'selected':''}>${esc(w.name)} · ${w.currency}</option>`).join('')}</select></label></div><div class="cols"><label>Kwota<input name="amount" required inputmode="decimal" value="${x.amount||''}"></label><label>Data<input type="date" name="date" required value="${x.date}"></label></div><label>Kategoria<select id="txCategory" name="category">${(x.type==='income'?S.incs:S.cats).map(c=>`<option ${c===x.category?'selected':''}>${esc(c)}</option>`).join('')}</select></label><div id="expenseOnly" class="${x.type==='income'?'hidden':''}"><label>Sklep / miejsce<input name="merchant" value="${esc(x.merchant||'')}"></label><label>Opis<input name="description" value="${esc(x.description||'')}"></label><label>${draftReceipt?'Zmień zdjęcie paragonu':'Dodaj zdjęcie paragonu'}<input type="file" accept="image/*" capture="environment" onchange="receiptFile(event)"></label><div id="receiptPreview">${draftReceipt?`<img class="receipt-preview" src="${draftReceipt}"><div class="receipt-actions"><button class="btn" type="button" onclick="openDraftReceipt()">Otwórz</button><button class="btn danger" type="button" onclick="removeDraftReceipt()">Usuń paragon</button></div>`:''}</div></div><button class="primary">Zapisz</button></form>`)
 }
 function toggleTxType(t){document.getElementById('expenseOnly').classList.toggle('hidden',t==='income');document.getElementById('txCategory').innerHTML=(t==='income'?S.incs:S.cats).map(c=>`<option>${esc(c)}</option>`).join('')}
-function receiptFile(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const max=1400,scale=Math.min(1,max/im.width),c=document.createElement('canvas');c.width=Math.round(im.width*scale);c.height=Math.round(im.height*scale);c.getContext('2d').drawImage(im,0,0,c.width,c.height);draftReceipt=c.toDataURL('image/jpeg',.72);document.getElementById('receiptPreview').innerHTML=`<img class="receipt-preview" src="${draftReceipt}">`};im.src=r.result};r.readAsDataURL(f)}
+function receiptFile(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const max=1400,scale=Math.min(1,max/im.width),c=document.createElement('canvas');c.width=Math.round(im.width*scale);c.height=Math.round(im.height*scale);c.getContext('2d').drawImage(im,0,0,c.width,c.height);draftReceipt=c.toDataURL('image/jpeg',.72);document.getElementById('receiptPreview').innerHTML=`<img class="receipt-preview" src="${draftReceipt}"><div class="receipt-actions"><button class="btn" type="button" onclick="openDraftReceipt()">Otwórz</button><button class="btn danger" type="button" onclick="removeDraftReceipt()">Usuń paragon</button></div>`};im.src=r.result};r.readAsDataURL(f)}
+function removeDraftReceipt(){draftReceipt='';document.getElementById('receiptPreview').innerHTML='<p class="muted">Paragon zostanie usunięty po zapisaniu transakcji.</p>'}
+function openDraftReceipt(){if(draftReceipt)openImage(draftReceipt,'Paragon')}
+function openImage(src,title='Paragon'){const w=window.open();if(!w)return alert('Przeglądarka zablokowała nowe okno.');w.document.write(`<title>${esc(title)}</title><meta name="viewport" content="width=device-width,initial-scale=1"><body style="margin:0;background:#222;display:grid;place-items:center;min-height:100vh"><img src="${src}" style="max-width:100%;height:auto"></body>`)}
+function openReceipt(id){const x=S.items.find(i=>i.id===id);if(x?.receipt)openImage(x.receipt,'Paragon — '+(x.merchant||x.category))}
+function showTxDetails(id){const x=S.items.find(i=>i.id===id);if(!x)return;if(x.type==='transfer'){const fw=wallet(x.fromWalletId),tw=wallet(x.toWalletId);return openModal('Szczegóły transferu',`<div class="detail-list"><div class="detail-line"><b>Data</b><span>${fmtDate(x.date)}</span></div><div class="detail-line"><b>Z portfela</b><span>${esc(fw.name)} · ${cash(x.amountFrom,fw.currency)}</span></div><div class="detail-line"><b>Do portfela</b><span>${esc(tw.name)} · ${cash(x.amountTo,tw.currency)}</span></div><div class="detail-line"><b>Opis</b><span>${esc(x.note||'Transfer')}</span></div></div>`)}const w=wallet(x.walletId);openModal('Szczegóły transakcji',`<div class="detail-list"><div class="detail-line"><b>Typ</b><span>${x.type==='income'?'Przychód':'Wydatek'}</span></div><div class="detail-line"><b>Kwota</b><strong>${cash(x.amount,w.currency)}</strong></div><div class="detail-line"><b>Data</b><span>${fmtDate(x.date)}</span></div><div class="detail-line"><b>Portfel</b><span>${esc(w.name)}</span></div><div class="detail-line"><b>Kategoria</b><span>${esc(x.category)}</span></div>${x.merchant?`<div class="detail-line"><b>Sklep / miejsce</b><span>${esc(x.merchant)}</span></div>`:''}${x.description?`<div class="detail-line"><b>Opis</b><span>${esc(x.description)}</span></div>`:''}</div>${x.receipt?`<div class="receipt-actions"><button class="primary" onclick="openReceipt('${x.id}')">Otwórz paragon</button><button class="btn" onclick="closeModal();txModal('${x.type}','${x.id}')">Zmień lub usuń</button></div>`:''}`)}
 function saveTx(e,id){e.preventDefault();const d=new FormData(e.target),type=d.get('type'),amount=Number(String(d.get('amount')).replace(',','.'));if(!amount||amount<0)return alert('Podaj poprawną kwotę.');const item={id:id||uid(),type,amount,date:d.get('date'),category:d.get('category'),walletId:d.get('walletId'),merchant:type==='expense'?d.get('merchant'):'',description:type==='income'?d.get('category'):d.get('description'),receipt:type==='expense'?draftReceipt:''};if(id)S.items=S.items.map(x=>x.id===id?item:x);else S.items.unshift(item);persist();closeModal();render();toast('Zapisano')}
 function removeTx(id){if(!confirm('Usunąć tę operację?'))return;S.items=S.items.filter(i=>i.id!==id);persist();render()}
 
@@ -350,14 +379,24 @@ function deleteBill(id){if(confirm('Usunąć tę opłatę?')){S.bills=S.bills.fi
 function exportData(){const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='wspolny-portfel-backup.json';a.click();URL.revokeObjectURL(a.href)}
 function importData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);['items','trash','cats','incs','bills','notes','settings','wallets'].forEach(k=>{if(d[k]!==undefined)S[k]=d[k]});persist();render();toast('Dane zaimportowane')}catch{alert('Nieprawidłowy plik JSON')}};r.readAsText(f)}
 
+let deferredInstallPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstallPrompt=e;updatePwaStatus()});
+window.addEventListener('appinstalled',()=>{deferredInstallPrompt=null;toast('Aplikacja została zainstalowana');updatePwaStatus()});
+async function installPwa(){if(deferredInstallPrompt){deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;updatePwaStatus()}else alert('Na Androidzie otwórz menu przeglądarki i wybierz „Zainstaluj aplikację”. Na iPhonie użyj Safari: Udostępnij → Do ekranu początkowego.')}
+function updatePwaStatus(){const el=document.getElementById('pwaStatus');if(!el)return;el.textContent=window.matchMedia('(display-mode: standalone)').matches?'Aplikacja jest uruchomiona w trybie PWA.':deferredInstallPrompt?'Aplikacja jest gotowa do zainstalowania.':'Jeśli przycisk nie zadziała, użyj opcji instalacji w menu przeglądarki.'}
+async function enableNotifications(){if(!('Notification'in window))return alert('Ta przeglądarka nie obsługuje powiadomień.');const permission=await Notification.requestPermission();if(permission==='granted'){S.settings.notifications=true;persist();toast('Powiadomienia zostały włączone');checkBillAlerts(true)}else alert('Nie udzielono zgody na powiadomienia.')}
+async function checkBillAlerts(force=false){const due=S.bills.filter(x=>x.active!==false&&daysUntil(x.nextDate)<=3);if(!due.length)return;const key='wp-bill-alert-'+today(),already=localStorage.getItem(key);if(!force&&already)return;localStorage.setItem(key,'1');if(S.settings.notifications&&'Notification'in window&&Notification.permission==='granted'){const reg='serviceWorker'in navigator?await navigator.serviceWorker.ready:null;due.slice(0,4).forEach(b=>{const d=daysUntil(b.nextDate),text=d<0?`Zaległe od ${Math.abs(d)} dni`:d===0?'Termin dzisiaj':`Termin za ${d} dni`,options={body:`${text} · ${cash(b.amount,wallet(b.walletId).currency)}`,icon:'icon-192.png',badge:'icon-192.png',tag:'bill-'+b.id};if(reg)reg.showNotification('Wspólny Portfel — '+b.name,options);else new Notification('Wspólny Portfel — '+b.name,options)})}}
+if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+
 function render(){
   document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===S.tab));
   document.getElementById('title').textContent={home:'Wspólny Portfel',transactions:'Transakcje',summary:'Podsumowanie',settings:'Ustawienia'}[S.tab];
-  renderMonthBar();document.getElementById('view').innerHTML=S.tab==='home'?home():S.tab==='transactions'?transactions():S.tab==='summary'?summary():settings();persist();if(S.tab==='transactions')setTimeout(filter,0)
+  renderMonthBar();document.getElementById('view').innerHTML=S.tab==='home'?home():S.tab==='transactions'?transactions():S.tab==='summary'?summary():settings();persist();if(S.tab==='transactions')setTimeout(filter,0);if(S.tab==='settings')setTimeout(updatePwaStatus,0)
 }
 document.getElementById('nav').addEventListener('click',e=>{if(e.target.dataset.tab){S.tab=e.target.dataset.tab;render()}});
 document.addEventListener('input',e=>{if(['q','ft','fc','fw'].includes(e.target.id))filter()});
 render();
+setTimeout(()=>checkBillAlerts(false),700);
 </script>
 </body>
 </html>

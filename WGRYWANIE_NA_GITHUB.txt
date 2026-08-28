@@ -1,0 +1,10 @@
+WSPOLNY PORTFEL PWA v3
+
+1. Wgraj wszystkie pliki z tej paczki do glownego katalogu repozytorium GitHub.
+2. Plik index.html musi byc widoczny bezposrednio w katalogu glownym.
+3. W Settings > Pages ustaw: Deploy from a branch, main, / (root).
+4. Po opublikowaniu otworz strone na telefonie.
+5. Android: menu przegladarki > Zainstaluj aplikacje.
+6. iPhone: Safari > Udostepnij > Do ekranu poczatkowego.
+
+Powiadomienia systemowe dzialaja po udzieleniu zgody i otwarciu aplikacji.
