@@ -1,0 +1,43 @@
+WSPÓLNY PORTFEL — OFFLINE v5.0 INFOGRAFIKI
+================================
+
+1. Rozpakuj cały plik ZIP.
+2. Kliknij dwa razy URUCHOM_APLIKACJE.bat.
+3. Nie zamykaj okna PowerShell podczas korzystania z aplikacji.
+
+Wersja działa bez GitHuba, Firebase i Node.js.
+Dane są zapisywane lokalnie w przeglądarce tego urządzenia.
+
+NOWE FUNKCJE v3.0:
+- saldo początkowe dla miesiąca,
+- automatyczne przenoszenie salda,
+- wydarzenia i projekty,
+- harmonogram rat,
+- terminy gwarancji,
+- wiele załączników przy wydatku,
+- paragon dodawany bezpośrednio w formularzu wydatku,
+- notatki miesięczne,
+- rejestr wartościowych zakupów.
+
+ZMIANA v3.1:
+- szybki pasek wszystkich miesięcy zamiast otwieranego kalendarza,
+- wyraźne zaznaczenie aktywnego miesiąca,
+- strzałki zmiany roku,
+- poziome przewijanie paska na telefonie.
+
+ZMIANA v3.2:
+- moduł rachunków i subskrypcji,
+- telefon, internet, prąd, woda, gaz, telewizja, ubezpieczenia i serwisy,
+- terminy miesięczne, kwartalne i roczne,
+- oznaczanie opłaty jako zapłaconej,
+- automatyczne utworzenie wydatku i przesunięcie kolejnego terminu.
+
+ZMIANA v4.0 — NOWY UKŁAD BANKOWY:
+- interfejs inspirowany bankowością ING Banku Śląskiego,
+- jasne tło, białe karty i mocny pomarańczowy akcent,
+- ciemnogranatowa nawigacja z czytelnym aktywnym działem,
+- duża karta salda oraz bardziej przejrzyste zestawienia,
+- wygodniejszy pasek miesięcy i formularze,
+- dopracowany układ mobilny.
+
+Aplikacja startuje bez przykładowych transakcji.
