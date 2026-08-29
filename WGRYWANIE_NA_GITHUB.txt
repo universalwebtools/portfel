@@ -1,4 +1,4 @@
-WSPOLNY PORTFEL PWA v5 — POPRAWIONY POLSKI OCR
+WSPOLNY PORTFEL PWA v6 — BEZ OCR
 
 1. Wgraj wszystkie pliki z tej paczki do glownego katalogu repozytorium GitHub.
 2. Plik index.html musi byc widoczny bezposrednio w katalogu glownym.
@@ -8,4 +8,4 @@ WSPOLNY PORTFEL PWA v5 — POPRAWIONY POLSKI OCR
 6. iPhone: Safari > Udostepnij > Do ekranu poczatkowego.
 
 Powiadomienia systemowe dzialaja po udzieleniu zgody i otwarciu aplikacji.
-Dokladny polski model OCR jest dolaczony do paczki i nie wysyla zdjec paragonow do internetu.
+Zdjecie paragonu mozna zrobic aparatem albo wybrac z galerii. Jest zapisywane jako zalacznik do wydatku, bez rozpoznawania tekstu.
