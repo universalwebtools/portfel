@@ -1,4 +1,4 @@
-WSPOLNY PORTFEL PWA v3
+WSPOLNY PORTFEL PWA v4 — LOKALNY OCR
 
 1. Wgraj wszystkie pliki z tej paczki do glownego katalogu repozytorium GitHub.
 2. Plik index.html musi byc widoczny bezposrednio w katalogu glownym.
@@ -8,3 +8,4 @@ WSPOLNY PORTFEL PWA v3
 6. iPhone: Safari > Udostepnij > Do ekranu poczatkowego.
 
 Powiadomienia systemowe dzialaja po udzieleniu zgody i otwarciu aplikacji.
+Modul OCR jest dolaczony do paczki i nie wysyla zdjec paragonow do internetu.
